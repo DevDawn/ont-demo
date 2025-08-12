@@ -7,8 +7,8 @@ This project lets you log in using your **ONTO Wallet Extension** and **Ont ID**
 1. **Clone the Repository**
 
    ```bash
-   git clone <repo-url>
-   cd <repo-folder>
+   git clone https://github.com/barnazaka/ont-demo
+   cd Ont-demo
    ```
 
 2. **Install Dependencies**
@@ -20,7 +20,7 @@ This project lets you log in using your **ONTO Wallet Extension** and **Ont ID**
 3. **Run the Project**
 
    ```bash
-   npm start
+   node server.js
    ```
 
 ## How to Log In with Ont ID
