@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login Success</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .wallet-info {
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #f44336;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+    button:hover {
+      background-color: #d32f2f;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Login Successful!</h1>
+    <div class="wallet-info" id="walletAddress"></div>
+    <button id="logoutBtn">Logout</button>
+  </div>
+
+  <script>
+    // Get query parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const address = urlParams.get('address');
+    const token = urlParams.get('token');
+
+    // Display wallet address
+    document.getElementById('walletAddress').innerHTML = `
+      <strong>Wallet Address:</strong> ${address || 'Not provided'}<br>
+      <strong>Token:</strong> ${token || 'Not provided'}
+    `;
+
+    // Logout button event listener
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      // Call logout endpoint
+      await fetch('/logout', { method: 'POST' });
+      // Redirect to index.html
+      window.location.href = '/';
+    });
+  </script>
+</body>
+</html>
