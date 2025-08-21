@@ -1,56 +1,142 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>ONT ID Login Demo</title>
+  <title>ONT ID Secure Login</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin-top: 50px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f7f6; /* Light, clean background */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
     }
+
     .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      display: flex;
+      max-width: 900px;
+      width: 90%;
+      overflow: hidden;
     }
-    .login-section {
-      display: block;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-      background-color: #4CAF50;
+
+    .image-section {
+      flex: 1;
+      background: linear-gradient(135deg, #2A54E3, #0E2472); /* Ontology Gradient */
       color: white;
-      border: none;
-      border-radius: 5px;
-      margin: 5px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      text-align: center;
     }
-    #logoutBtn {
-      background-color: #f44336;
-      display: none; /* Hidden by default */
+
+    .image-section h2 {
+      font-size: 2.5em;
+      margin-bottom: 20px;
     }
-    button:hover {
-      background-color: #45a049;
+
+    .image-section p {
+      font-size: 1.1em;
+      line-height: 1.6;
     }
-    #logoutBtn:hover {
-      background-color: #d32f2f;
+
+    .login-section {
+      flex: 1;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: stretch; /* Make buttons fill the width */
     }
+
+    .login-section h1 {
+      color: #333;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
     #walletAddress {
-      margin: 10px 0;
+      margin: 20px 0;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
       font-weight: bold;
+      color: #555;
+      text-align: center;
+      word-wrap: break-word;
+    }
+
+    button {
+      padding: 15px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      transition: all 0.3s ease;
+    }
+
+    #loginBtn {
+      background-color: #0E2472; /* Ontology Dark Blue */
+      color: white;
+    }
+    
+    #loginBtn:hover {
+      background-color: #2A54E3; /* Ontology Light Blue */
+    }
+
+    #logoutBtn {
+      background-color: #dc3545;
+      color: white;
       display: none; /* Hidden by default */
+    }
+    
+    #logoutBtn:hover {
+      background-color: #c82333;
+    }
+
+    #loginBtn:disabled {
+      background-color: #5cb85c; /* Success green */
+      cursor: not-allowed;
+      opacity: 1;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-weight: bold;
+      text-align: center;
+      min-height: 24px;
+    }
+    
+    .success {
+      color: #28a745; /* Green for success */
+    }
+
+    .error {
+      color: #dc3545; /* Red for error */
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div id="loginSection" class="login-section">
+    <div class="image-section">
+      <h2>Secure Platform</h2>
+      <p>Decentralized login powered by ONT ID.</p>
+      <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22" x2="12" y2="12"></line></svg>
+    </div>
+    <div class="login-section">
       <h1>Login with ONT ID</h1>
-      <div id="walletAddress"></div>
-      <button id="loginBtn">Login</button>
+      <div id="walletAddress" style="display: none;"></div>
+      <button id="loginBtn">Login with ONT ID</button>
       <button id="logoutBtn">Logout</button>
-      <div id="result" style="margin-top:20px; font-weight: bold;"></div>
+      <div id="result"></div>
     </div>
   </div>
 
@@ -61,38 +147,35 @@
     const resultDiv = document.getElementById("result");
     const walletAddressDiv = document.getElementById("walletAddress");
 
-    // Provider detection (MetaMask or ONTO Wallet)
     const provider = window.ethereum || window.onto;
 
-    // Function to update UI based on login state
     function updateUI(isLoggedIn) {
       if (isLoggedIn) {
         loginBtn.textContent = "Connected";
         loginBtn.disabled = true;
-        loginBtn.style.backgroundColor = "#888";
-        logoutBtn.style.display = "inline-block";
+        logoutBtn.style.display = "block";
         const walletAddress = localStorage.getItem("walletAddress");
         if (walletAddress) {
-          walletAddressDiv.textContent = `Wallet Address: ${walletAddress}`;
+          walletAddressDiv.textContent = `Wallet: ${walletAddress.substring(0, 6)}...${walletAddress.slice(-4)}`;
           walletAddressDiv.style.display = "block";
         }
-        resultDiv.innerHTML = "✅ Logged in";
+        resultDiv.textContent = "✅ Logged in successfully!";
+        resultDiv.className = "success";
       } else {
-        loginBtn.textContent = "Login";
+        loginBtn.textContent = "Login with ONT ID";
         loginBtn.disabled = false;
-        loginBtn.style.backgroundColor = "#4CAF50";
+        loginBtn.style.backgroundColor = "";
         logoutBtn.style.display = "none";
         walletAddressDiv.textContent = "";
         walletAddressDiv.style.display = "none";
-        resultDiv.innerHTML = "";
+        resultDiv.textContent = "";
+        resultDiv.className = "";
       }
     }
 
-    // Check login state on page load
     const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
     updateUI(isLoggedIn);
 
-    // Global function to sign data with fallback methods
     window.signData = function(account, signData) {
       return new Promise((resolve, reject) => {
         const methods = ['eth_signTypedData_v4', 'eth_signTypedData_v3', 'eth_signTypedData'];
@@ -100,7 +183,6 @@
 
         function tryNextMethod() {
           if (methodIndex >= methods.length) {
-            // Fallback to eth_sign
             console.log("Falling back to eth_sign...");
             const message = `Login to ONT ID Demo: ${signData.message.nonce}`;
             provider.request({
@@ -113,13 +195,14 @@
             })
             .catch(error => {
               console.warn(`eth_sign failed: ${error.message}`);
-              reject(new Error('No supported signing method found. Ensure your wallet supports EIP-712 or eth_sign.'));
+              reject(new Error('Signature request was rejected or failed.'));
             });
             return;
           }
-
-          const method = methods[methodIndex];
+          
+          const method = methods[methodIndex]; 
           console.log(`Attempting to sign with ${method}...`);
+
           provider.request({
             method,
             params: [account, JSON.stringify(signData)]
@@ -134,27 +217,27 @@
             tryNextMethod();
           });
         }
-
         tryNextMethod();
       });
     };
 
     loginBtn.addEventListener("click", async () => {
+      resultDiv.textContent = "Connecting to wallet...";
+      resultDiv.className = "";
       try {
         if (!provider) {
-          throw new Error("No Ethereum provider found. Install MetaMask or ONTO Wallet.");
+          throw new Error("No wallet provider found. Install ONTO Wallet or MetaMask.");
         }
 
-        // Log provider details for debugging
-        console.log("Provider detected:", {
-          isONTO: !!window.onto,
-          isMetaMask: !!provider.isMetaMask,
-          providerProperties: Object.keys(provider),
-          supportsRequest: typeof provider.request === 'function'
-        });
-
-        // 1. Create auth request
-        console.log("Creating auth request...");
+        console.log("Requesting accounts...");
+        const accounts = await provider.request({ method: "eth_requestAccounts" });
+        const account = accounts[0];
+        if (!account) {
+            throw new Error("No accounts found in the wallet.");
+        }
+        console.log("Account:", account);
+        
+        // --- THIS PART IS RESTORED TO MATCH YOUR ORIGINAL FUNCTIONALITY ---
         const authRequest = {
           type: "AuthRequest",
           chain: "eth",
@@ -167,125 +250,81 @@
           requestId: Date.now().toString(),
           callbackUrl: `${window.location.protocol}//${window.location.host}/submit-auth`
         };
-        console.log("Auth request created:", authRequest);
 
-        // 2. Get challenge from backend
-        console.log("Fetching challenge...");
+        console.log("Fetching challenge from backend using POST...");
         const challengeResponse = await fetch("/get-challenge", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ authRequest })
         });
-        if (!challengeResponse.ok) {
-          const errorText = await challengeResponse.text();
-          throw new Error(`Challenge fetch failed: ${challengeResponse.statusText} - ${errorText}`);
-        }
+        if (!challengeResponse.ok) throw new Error(`Server error fetching challenge: ${challengeResponse.statusText}`);
         const challenge = await challengeResponse.json();
         console.log("Challenge received:", challenge);
+        // --- END OF RESTORED SECTION ---
 
-        // 3. Request accounts
-        console.log("Requesting accounts...");
-        const accounts = await provider.request({ method: "eth_requestAccounts" });
-        const account = accounts[0];
-        console.log("Account:", account);
-
-        // 4. Build DID
         const did = `did:etho:${account.replace("0x", "")}`;
         console.log("DID:", did);
 
-        // 5. Prepare sign data
-        console.log("Creating sign data...");
         const signData = {
           types: {
             EIP712Domain: [
-              { name: "name", type: "string" },
-              { name: "version", type: "string" },
-              { name: "chainId", type: "uint256" },
-              { name: "verifyingContract", type: "address" }
+              { name: "name", type: "string" }, { name: "version", type: "string" },
+              { name: "chainId", type: "uint256" }, { name: "verifyingContract", type: "address" }
             ],
             AuthChallenge: [
-              { name: "nonce", type: "string" },
-              { name: "did", type: "string" },
+              { name: "nonce", type: "string" }, { name: "did", type: "string" },
               { name: "created", type: "string" }
             ]
           },
           domain: {
-            name: "ONT ID Demo",
-            version: "1.0",
-            chainId: 1, // Ethereum mainnet; adjust for testnet (e.g., 11155111 for Sepolia)
+            name: "ONT ID Demo", version: "1.0", chainId: 1,
             verifyingContract: "0x0000000000000000000000000000000000000000"
           },
           primaryType: "AuthChallenge",
           message: {
-            nonce: challenge.nonce,
-            did,
-            created: new Date().toISOString()
+            nonce: challenge.nonce, did, created: new Date().toISOString()
           }
         };
-        console.log("Sign data:", signData);
 
-        // 6. Sign using wallet
-        console.log("Signing data...");
-        if (typeof window.signData !== 'function') {
-          throw new Error("signData function is not defined. Please check the script loading.");
-        }
+        resultDiv.textContent = "Please sign the message in your wallet...";
         const { signature, method } = await window.signData(account, signData);
         console.log("Signature:", signature, "Method:", method);
 
-        // 7. Build auth response
         const authResponse = {
-          ver: "1.0",
-          type: "ClientResponse",
-          nonce: challenge.nonce,
-          did,
+          ver: "1.0", type: "ClientResponse", nonce: challenge.nonce, did,
           proof: {
             type: method === 'eth_sign' ? 'eth_sign' : 'ecdsa',
-            verificationMethod: `${did}#key-1`,
-            created: signData.message.created,
-            value: signature
-          },
-          VPs: []
+            verificationMethod: `${did}#key-1`, created: signData.message.created, value: signature
+          }, VPs: []
         };
-        console.log("Auth response:", authResponse);
-
-        // 8. Submit to backend
-        console.log("Submitting auth response...");
+        
+        console.log("Submitting auth response to backend...");
         const resultResponse = await fetch("/submit-auth", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+          method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify(authResponse)
         });
-        if (!challengeResponse.ok) {
-          const errorText = await resultResponse.text();
-          throw new Error(`Submit auth failed: ${resultResponse.statusText} - ${errorText}`);
-        }
+        if (!resultResponse.ok) throw new Error(`Server error submitting signature: ${resultResponse.statusText}`);
         const result = await resultResponse.json();
-        if (result.error) {
-          throw new Error(`Login failed: ${result.error}`);
-        }
+        if (result.error) throw new Error(result.error);
         console.log("Login result:", result);
 
-        // 9. Save login state and wallet address, then update UI
         localStorage.setItem("isLoggedIn", "true");
         localStorage.setItem("walletAddress", account);
         updateUI(true);
+
       } catch (error) {
-        console.error("Login error:", error);
-        resultDiv.innerHTML = `❌ Login failed: ${error.message}`;
+        console.error("Login process error:", error);
+        resultDiv.textContent = `❌ ${error.message}`;
+        resultDiv.className = "error";
       }
     });
 
     logoutBtn.addEventListener("click", async () => {
-      try {
-        console.log("Logging out...");
-        await fetch("/logout", { method: "POST" });
-        localStorage.removeItem("isLoggedIn");
-        localStorage.removeItem("walletAddress");
-        updateUI(false);
-      } catch (error) {
-        console.error("Logout error:", error);
-        resultDiv.innerHTML = `❌ Logout failed: ${error.message}`;
-      }
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("walletAddress");
+      updateUI(false);
+      resultDiv.textContent = "You have been logged out.";
+      resultDiv.className = "";
     });
   </script>
 </body>
